@@ -2,14 +2,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { useContext } from 'react';
 
-// Vom crea aceste pagini in pasul urmator, momentan facem doar importurile
-// (Daca iti da eroare ca nu exista, creeaza fisiere goale in 'pages' pentru ele)
 import Login from './pages/Login';
 import Register from './pages/Register';
 import StudentDashboard from './pages/StudentDashboard';
 import ProfDashboard from './pages/ProfDashboard';
 
-// O componenta care protejeaza rutele (te trimite la login daca nu esti autentificat)
 const PrivateRoute = ({ children, roleRequired }) => {
     const { user, token } = useContext(AuthContext);
 
@@ -18,7 +15,7 @@ const PrivateRoute = ({ children, roleRequired }) => {
     }
 
     if (roleRequired && user.rol !== roleRequired) {
-        return <Navigate to="/" />; // Redirect daca nu ai rolul potrivit
+        return <Navigate to="/" />; 
     }
 
     return children;
@@ -33,7 +30,7 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         
-                        {/* Rute Protejate */}
+                        {}
                         <Route 
                             path="/student" 
                             element={
@@ -52,7 +49,7 @@ function App() {
                             } 
                         />
 
-                        {/* Redirect default */}
+                        {}
                         <Route path="*" element={<Navigate to="/login" />} />
                     </Routes>
                 </div>

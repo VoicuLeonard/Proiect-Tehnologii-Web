@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
 
-    // Functia de Login
     const login = (userData, newToken) => {
         setUser(userData);
         setToken(newToken);
@@ -24,7 +23,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(userData));
     };
 
-    // Functia de Logout
     const logout = () => {
         setUser(null);
         setToken(null);

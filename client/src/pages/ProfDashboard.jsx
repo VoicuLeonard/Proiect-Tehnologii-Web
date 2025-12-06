@@ -29,11 +29,9 @@ export default function ProfDashboard() {
         } catch (err) { alert('Eroare la procesare'); }
     };
 
-    // Functie pentru a repara calea fisierului (Windows foloseste \ dar web-ul vrea /)
     const getFileUrl = (path) => {
         if (!path) return '#';
-        // Backend-ul serveste static folderul 'uploads', deci stergem 'uploads\' din cale daca exista
-        // Si ne asiguram ca folosim /
+
         const cleanPath = path.replace(/\\/g, '/'); 
         return `http://localhost:8080/${cleanPath}`;
     };
@@ -48,7 +46,7 @@ export default function ProfDashboard() {
             {message && <div style={styles.success}>{message}</div>}
 
             <div style={styles.mainGrid}>
-                {/* Creare Sesiune */}
+                {}
                 <div style={styles.section}>
                     <h3>Creează o Sesiune Nouă</h3>
                     <form onSubmit={handleCreateSession} style={styles.form}>
@@ -64,7 +62,7 @@ export default function ProfDashboard() {
                     </form>
                 </div>
 
-                {/* Lista Cereri */}
+                {}
                 <div style={styles.section}>
                     <h3>Cereri de la Studenți</h3>
                     {applications.length === 0 ? <p>Nicio cerere.</p> : (
@@ -74,7 +72,7 @@ export default function ProfDashboard() {
                                     <p><strong>{app.student?.nume}</strong> - {app.sesiune?.titlu}</p>
                                     <p>Status: <span style={getStatusStyle(app.status)}>{app.status}</span></p>
                                     
-                                    {/* BUTOANE APROBARE INITIALA */}
+                                    {}
                                     {app.status === 'PENDING' && (
                                         <div style={{marginTop: '10px'}}>
                                             <button onClick={() => handleVerdict(app.id, 'APPROVED_PRELIM')} style={{...styles.btn, background: 'green'}}>Acceptă Preliminar</button>
@@ -82,7 +80,7 @@ export default function ProfDashboard() {
                                         </div>
                                     )}
 
-                                    {/* ZONA DECIZIE FINALA (Dupa ce studentul a incarcat fisierul) */}
+                                    {}
                                     {app.status === 'FILE_UPLOADED' && (
                                         <div style={{marginTop: '10px', padding: '10px', background: '#e9ecef', borderRadius: '5px'}}>
                                             <p style={{marginBottom: '5px'}}>📄 Studentul a încărcat cererea.</p>

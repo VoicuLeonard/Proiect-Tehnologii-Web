@@ -7,7 +7,7 @@ export default function Register() {
         nume: '',
         email: '',
         parola: '',
-        rol: 'STUDENT' // Implicit e student
+        rol: 'STUDENT' 
     });
     const [message, setMessage] = useState('');
     
@@ -24,7 +24,6 @@ export default function Register() {
             await api.post('/auth/register', formData);
             setMessage('Cont creat cu succes! Te redirectionam...');
             
-            // Dupa 2 secunde il trimitem la login
             setTimeout(() => navigate('/login'), 2000);
         } catch (err) {
             setMessage(err.response?.data?.message || 'Eroare la inregistrare');

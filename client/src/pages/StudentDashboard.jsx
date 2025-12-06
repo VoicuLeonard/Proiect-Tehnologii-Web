@@ -7,7 +7,6 @@ export default function StudentDashboard() {
     const [myApplications, setMyApplications] = useState([]);
     const [message, setMessage] = useState('');
     
-    // State pentru fisierul selectat
     const [selectedFile, setSelectedFile] = useState(null);
 
     useEffect(() => {
@@ -31,19 +30,18 @@ export default function StudentDashboard() {
         } catch (err) { alert('Eroare la aplicare'); }
     };
 
-    // Functia noua de Upload
     const handleUpload = async (appId) => {
         if (!selectedFile) return alert("Selecteaza un fisier!");
 
         const formData = new FormData();
-        formData.append('fisier', selectedFile); // 'fisier' trebuie sa fie acelasi nume ca in multer (backend)
+        formData.append('fisier', selectedFile); 
 
         try {
             await api.post(`/applications/${appId}/upload`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             alert("Fisier incarcat cu succes!");
-            fetchMyApplications(); // Reimprospatam lista
+            fetchMyApplications(); 
             setSelectedFile(null);
         } catch (err) {
             console.error(err);
@@ -87,7 +85,7 @@ export default function StudentDashboard() {
                             {app.justificare && <p style={{color: 'red', fontSize: '0.9em'}}>Motiv respingere: {app.justificare}</p>}
                         </div>
 
-                        {/* ZONA DE UPLOAD - Apare doar daca e Aprobat Preliminar */}
+                        {}
                         {(app.status === 'APPROVED_PRELIM' || app.status === 'REJECTED_FINAL') && (
                             <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
                                 <input type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />

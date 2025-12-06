@@ -16,7 +16,7 @@ const Session = sequelize.define('Session', {
         allowNull: true
     },
     dataStart: {
-        type: DataTypes.DATE, // Include si ora
+        type: DataTypes.DATE, 
         allowNull: false
     },
     dataEnd: {
