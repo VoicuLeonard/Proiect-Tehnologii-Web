@@ -1,80 +1,81 @@
-# Platformă Gestionare Cereri Disertație
+# Platforma Gestionare Cereri Disertatie
 
-Aceasta este o aplicație web de tip Single Page Application (SPA) cu un backend RESTful, destinată gestionării procesului de înscriere la sesiunile de disertație. Aplicația permite studenților să aplice la sesiuni create de profesori și profesorilor să gestioneze aceste cereri.
+Aceasta este o aplicatie web de tip Single Page Application (SPA) cu un backend RESTful, destinata gestionarii procesului de inscriere la sesiunile de disertatie. Aplicatia permite studentilor sa aplice la sesiuni create de profesori si profesorilor sa gestioneze aceste cereri.
 
 ##  Tehnologii Utilizate
 
 ### Backend
 * **Node.js & Express**: Pentru API-ul RESTful.
-* **SQLite & Sequelize ORM**: Pentru persistența datelor (bază de date relațională).
-* **JWT (JSON Web Tokens)**: Pentru autentificare și autorizare.
-* **Multer**: Pentru încărcarea fișierelor (cereri semnate).
+* **SQLite & Sequelize ORM**: Pentru persistenta datelor (baza de date relationala).
+* **JWT (JSON Web Tokens)**: Pentru autentificare si autorizare.
+* **Multer**: Pentru incarcarea fisierelor (cereri semnate).
 
 ### Frontend
 * **React.js (Vite)**: Framework bazat pe componente.
 * **Axios**: Pentru comunicarea cu API-ul backend.
 * **React Router**: Pentru navigare (SPA).
 
----
+-------------------------------------------------------------------------------------------
 
-##  Instrucțiuni de Instalare și Rulare
+##  Instructiuni de Instalare si Rulare
 
-Pentru a rula proiectul local, urmați acești pași:
+Pentru a rula proiectul local, urmati acesti pasi:
 
 ### 1. Clonarea Repository-ului
-Deschideți un terminal (CMD/PowerShell/Bash) și rulați:
+Deschideti un terminal (CMD/PowerShell/Bash) si rulati:
 
-git clone https://github.com/VoicuLeonard/AplicatieTW.git
+git clone https://github.com/VoicuLeonard/Proiect-Tehnologii-Web.git
+
 cd AplicatieTW
 
 ### 2. Configuare Backend (Server)
-Deschideți un terminal în folderul server și instalați dependențele:
+Deschideti un terminal in folderul server si instalati dependentele:
 
    * **cd server**
    * **npm install**
 
-Porniți serverul (acesta va rula pe portul 8080 și va crea automat baza de date database.sqlite):
+Porniti serverul (va crea automat baza de date database.sqlite):
 
    * **npm run dev**
 
 ### 3. Configurare Frontend (Client)
-Deschideți un al doilea terminal, navigați în folderul client și instalați dependențele:
+Deschideti un al doilea terminal, navigati in folderul client si instalati dependentele:
 
    * **cd client**
    * **npm install**
    
 
-Porniți aplicația React:
+Porniti aplicatia React:
 
    * **npm run dev**
 
-Accesați aplicația în browser la adresa afișată.
+Accesati aplicatia in browser la adresa afisata.
 
 -------------------------------------------------------------------------------------------
 
 # Documentație API 
-## Serviciul RESTful expune următoarele rute principale:
+## Serviciul RESTful expune urmatoarele rute principale:
 
 ## Autentificare (/api/auth)
-   * POST /register - Înregistrare utilizator nou (Student sau Profesor).
-   * POST /login - Autentificare și generare Token JWT.
+   * POST /register - Inregistrare utilizator nou (Student sau Profesor).
+   * POST /login - Autentificare si generare Token JWT.
 
 ## Sesiuni (/api/sessions)
-   * GET / - Returnează lista tuturor sesiunilor active (Acces: Autentificat).
-   * POST / - Creare sesiune nouă (Acces: Doar Profesor).
+   * GET / - Returneaza lista tuturor sesiunilor active (Acces: Autentificat).
+   * POST / - Creare sesiune noua (Acces: Doar Profesor).
 
-## Aplicații/Cereri (/api/applications)
-   * POST / - Studentul aplică la o sesiune.
-   * GET / - Vizualizare cereri (Studentul își vede cererile, Profesorul le vede pe cele primite).
+## Aplicatii/Cereri (/api/applications)
+   * POST / - Studentul aplica la o sesiune.
+   * GET / - Vizualizare cereri (Studentul isi vede cererile, Profesorul le vede pe cele primite).
    * PUT /:id/status - Modificare status cerere (Aprobare/Respingere) (Acces: Doar Profesor).
-   * POST /:id/upload - Încărcare fișier cerere semnată (Acces: Student cu status aprobat preliminar).
+   * POST /:id/upload - Incarcare fisier cerere semnata (Acces: Student cu status aprobat preliminar).
 
 -------------------------------------------------------------------------------------------
 
 # Conturi de Test 
-## Puteți crea conturi noi din interfață sau puteți folosi un flux standard:
+## Puteti crea conturi noi din interfata sau puteti folosi un flux standard:
 
-   * Creați un cont de Profesor(selectați rolul la înregistrare). 
-   * Creați o sesiune din dashboard-ul profesorului.
-   * Creați un cont de Student.
-   * Aplicați la sesiune.
+   * Creati un cont de Profesor (selectati rolul la inregistrare).
+   * Creati o sesiune din dashboard-ul profesorului.
+   * Creati un cont de Student.
+   * Aplicati la sesiune.
