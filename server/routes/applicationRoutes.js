@@ -10,11 +10,9 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/');
     },
     filename: (req, file, cb) => {
-
         cb(null, Date.now() + '_' + file.originalname);
     }
 });
-
 
 const upload = multer({ storage: storage });
 
@@ -33,7 +31,8 @@ router.post('/', verifyToken, async (req, res) => {
 
         const application = await Application.create({
             studentId,
-            sessionId
+            sessionId,
+            status: 'IN_ASTEPTARE'
         });
 
         res.status(201).json({ message: 'Cerere trimisa cu succes!', application });
@@ -76,7 +75,6 @@ router.get('/', verifyToken, async (req, res) => {
     }
 });
 
-
 router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
     try {
         const { id } = req.params; 
@@ -85,13 +83,12 @@ router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
         const application = await Application.findByPk(id);
         if (!application) return res.status(404).json({ message: 'Cererea nu exista' });
 
-        if (status === 'APPROVED_PRELIM') {
+        if (status === 'ACCEPTAT_PRELIMINAR') {
 
             const alreadyApproved = await Application.findOne({
                 where: { 
                     studentId: application.studentId,
-                    status: 'APPROVED_PRELIM',
-
+                    status: 'ACCEPTAT_PRELIMINAR',
                 }
             });
 
@@ -101,7 +98,7 @@ router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
 
             const session = await Session.findByPk(application.sessionId);
             const approvedCount = await Application.count({
-                where: { sessionId: application.sessionId, status: 'APPROVED_PRELIM' }
+                where: { sessionId: application.sessionId, status: 'ACCEPTAT_PRELIMINAR' }
             });
 
             if (approvedCount >= session.locuriMaxime) {
@@ -128,12 +125,12 @@ router.post('/:id/upload', [verifyToken, upload.single('fisier')], async (req, r
 
         if (!application) return res.status(404).json({ message: 'Cererea nu exista' });
 
-        if (application.status !== 'APPROVED_PRELIM' && application.status !== 'REJECTED_FINAL') {
+        if (application.status !== 'ACCEPTAT_PRELIMINAR' && application.status !== 'RESPINS_FINAL') {
             return res.status(400).json({ message: 'Nu poti incarca fisier in acest stadiu!' });
         }
 
         application.caleFisier = req.file.path; 
-        application.status = 'FILE_UPLOADED';   
+        application.status = 'FISIER_INCARCAT';   
         await application.save();
 
         res.json({ message: 'Fisier incarcat cu succes!', caleFisier: application.caleFisier });

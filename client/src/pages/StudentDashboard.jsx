@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import './Dashboard.css'; 
 
 export default function StudentDashboard() {
     const { user, api, logout } = useContext(AuthContext);
@@ -12,6 +13,13 @@ export default function StudentDashboard() {
     useEffect(() => {
         fetchSessions();
         fetchMyApplications();
+
+        const interval = setInterval(() => {
+            fetchSessions();
+            fetchMyApplications();
+        }, 3000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const fetchSessions = async () => {
@@ -27,6 +35,7 @@ export default function StudentDashboard() {
             await api.post('/applications', { sessionId });
             setMessage('Ai aplicat cu succes!');
             fetchMyApplications();
+            setTimeout(() => setMessage(''), 3000);
         } catch (err) { alert('Eroare la aplicare'); }
     };
 
@@ -51,73 +60,130 @@ export default function StudentDashboard() {
 
     const hasApplied = (sessionId) => myApplications.some(app => app.sessionId === sessionId);
 
+    const getStatusClass = (status) => {
+        if (status.includes('ACCEPTAT') || status.includes('APROBAT')) return 'status-badge status-approved';
+        if (status.includes('RESPINS')) return 'status-badge status-rejected';
+        return 'status-badge status-pending';
+    };
+
     return (
-        <div style={styles.container}>
-            <header style={styles.header}>
-                <h1>Panou Student: {user?.nume}</h1>
-                <button onClick={logout} style={styles.logoutBtn}>Deconectare</button>
-            </header>
+        <div className="page-wrapper">
+            <nav className="navbar">
+                <div className="nav-brand">
+                    <h1>🎓 Panou Student</h1>
+                </div>
+                <div className="nav-user">
+                    <span className="user-name">Salut, {user?.nume}</span>
+                    <button onClick={logout} className="btn-logout">Deconectare</button>
+                </div>
+            </nav>
 
-            {message && <div style={styles.success}>{message}</div>}
+            <div className="dashboard-container">
+                {message && <div className="alert-success">{message}</div>}
 
-            <h3>Sesiuni Disponibile</h3>
-            <div style={styles.grid}>
-                {sessions.map(session => (
-                    <div key={session.id} style={styles.card}>
-                        <h4>{session.titlu}</h4>
-                        <p>{session.descriere}</p>
-                        {hasApplied(session.id) ? 
-                            <button disabled style={styles.disabledBtn}>Ai aplicat deja</button> : 
-                            <button onClick={() => handleApply(session.id)} style={styles.applyBtn}>Trimite Cerere</button>
-                        }
-                    </div>
-                ))}
-            </div>
+                <h2 className="section-title">Sesiuni Disponibile</h2>
+                
+                <div className="sessions-grid">
+                    {sessions.map(session => {
+                        const isFull = session.locuriOcupate >= session.locuriMaxime;
+                        const applied = hasApplied(session.id);
 
-            <hr style={{margin: '30px 0'}} />
-            
-            <h3>Cererile Mele</h3>
-            <ul style={styles.list}>
-                {myApplications.map(app => (
-                    <li key={app.id} style={styles.listItem}>
-                        <div>
-                            <strong>{app.sesiune?.titlu}</strong> - Status: <span style={getStatusStyle(app.status)}>{app.status}</span>
-                            {app.justificare && <p style={{color: 'red', fontSize: '0.9em'}}>Motiv respingere: {app.justificare}</p>}
-                        </div>
-
-                        {}
-                        {(app.status === 'APPROVED_PRELIM' || app.status === 'REJECTED_FINAL') && (
-                            <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
-                                <input type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
-                                <button onClick={() => handleUpload(app.id)} style={styles.uploadBtn}>Incarca Cerere Semnata</button>
+                        return (
+                            <div key={session.id} className="card">
+                                <div>
+                                    <h4>{session.titlu}</h4>
+                                    <p className="card-desc">{session.descriere}</p>
+                                    <div style={{display: 'flex', justifyContent: 'space-between', color: '#888', fontSize: '0.9rem'}}>
+                                        <span>Locuri totale: {session.locuriMaxime}</span>
+                                        <span style={{fontWeight: 'bold', color: isFull ? 'red' : 'green'}}>
+                                            Ocupate: {session.locuriOcupate || 0}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div style={{marginTop: '15px'}}>
+                                    {applied ? (
+                                        <button disabled className="btn-disabled">Ai aplicat deja</button>
+                                    ) : isFull ? (
+                                        <button disabled className="btn-disabled" style={{backgroundColor: '#e74c3c', color: 'white'}}>
+                                            ⛔ Nu mai sunt locuri
+                                        </button>
+                                    ) : (
+                                        <button onClick={() => handleApply(session.id)} className="btn-primary">
+                                            Trimite Cerere
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        )}
-                        
-                        {app.status === 'FILE_UPLOADED' && <span style={{color: 'blue'}}>Fisier incarcat. Se asteapta validarea finala.</span>}
-                        {app.status === 'APPROVED_FINAL' && <span style={{color: 'green', fontWeight: 'bold'}}>🎉 Felicitari! Cerere acceptata final.</span>}
-                    </li>
-                ))}
-            </ul>
+                        );
+                    })}
+                </div>
+
+                <h2 className="section-title">Cererile Mele</h2>
+                
+                {myApplications.length === 0 ? (
+                    <div className="card">
+                        <p style={{margin: 0, color: '#666'}}>Nu ai trimis nicio cerere momentan.</p>
+                    </div>
+                ) : (
+                    <ul className="applications-list">
+                        {myApplications.map(app => (
+                            <li key={app.id} className="app-item">
+                                
+                                <div className="app-info">
+                                    <h3>{app.sesiune?.titlu || "Sesiune stearsa"}</h3>
+                                    <div className="app-meta">
+                                        <span>Status:</span>
+                                        <span className={getStatusClass(app.status)}>
+                                            {app.status}
+                                        </span>
+                                    </div>
+                                    {app.justificare && (
+                                        <p style={{color: '#d63031', fontSize: '0.85rem', marginTop: '5px', background: '#ffe6e6', padding: '5px', borderRadius: '4px'}}>
+                                            ⚠️ Motiv: {app.justificare}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="app-actions">
+                                    {(app.status === 'ACCEPTAT_PRELIMINAR' || app.status === 'RESPINS_FINAL') && (
+                                        <div className="upload-wrapper">
+                                            <input 
+                                                type="file" 
+                                                id={`file-${app.id}`} 
+                                                onChange={(e) => setSelectedFile(e.target.files[0])} 
+                                            />
+                                            <label htmlFor={`file-${app.id}`} className="custom-file-label">
+                                                📁 Alege Fisier
+                                            </label>
+
+                                            <span className="file-name-display">
+                                                {selectedFile ? selectedFile.name : "Niciun fisier ales"}
+                                            </span>
+
+                                            <button onClick={() => handleUpload(app.id)} className="btn-upload">
+                                                Incarca
+                                            </button>
+                                        </div>
+                                    )}
+                                    
+                                    {app.status === 'FISIER_INCARCAT' && (
+                                        <span style={{color: '#0984e3', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px'}}>
+                                            ⏳ Fisier trimis. Se asteapta validarea.
+                                        </span>
+                                    )}
+                                    
+                                    {app.status === 'APROBAT_FINAL' && (
+                                        <span style={{color: '#00b894', fontWeight: 'bold', fontSize: '1.1rem'}}>
+                                              ✅ Dosar Complet
+                                        </span>
+                                    )}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
         </div>
     );
 }
-
-const getStatusStyle = (status) => ({
-    fontWeight: 'bold',
-    color: status.includes('APPROVED') ? 'green' : status.includes('REJECTED') ? 'red' : 'orange',
-    marginLeft: '5px'
-});
-
-const styles = {
-    container: { maxWidth: '800px', margin: '0 auto', padding: '20px' },
-    header: { display: 'flex', justifyContent: 'space-between', marginBottom: '20px' },
-    logoutBtn: { background: '#dc3545', color: '#fff', border: 'none', padding: '5px 10px', cursor: 'pointer' },
-    grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' },
-    card: { border: '1px solid #ddd', padding: '15px', borderRadius: '5px' },
-    applyBtn: { background: '#007bff', color: '#fff', border: 'none', padding: '8px', width: '100%', cursor: 'pointer' },
-    disabledBtn: { background: '#ccc', color: '#fff', border: 'none', padding: '8px', width: '100%', cursor: 'not-allowed' },
-    uploadBtn: { background: '#28a745', color: '#fff', border: 'none', padding: '5px 10px', cursor: 'pointer' },
-    list: { listStyle: 'none', padding: 0 },
-    listItem: { borderBottom: '1px solid #eee', padding: '15px 0', display: 'flex', flexDirection: 'column', gap: '10px' },
-    success: { background: '#d4edda', padding: '10px', marginBottom: '15px' }
-};

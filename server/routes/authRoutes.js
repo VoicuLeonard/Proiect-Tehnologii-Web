@@ -4,8 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-const JWT_SECRET = 'secretul_meu_super_secret_pentru_licenta';
-
+const JWT_SECRET = 'secretul_meu_super_secret_pentru_proiect';
 
 router.post('/register', async (req, res) => {
     try {

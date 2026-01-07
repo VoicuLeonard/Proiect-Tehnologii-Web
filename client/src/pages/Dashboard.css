@@ -1,0 +1,239 @@
+.navbar {
+  background-color: #2c3e50;
+  background-image: none;
+  padding: 1.5rem 3rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  color: white;
+  border-bottom: 4px solid #c0392b;
+}
+
+.nav-brand h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #ecf0f1;
+  font-size: 1.1rem;
+}
+
+.btn-logout {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 20px;
+  transition: background 0.3s;
+}
+
+.btn-logout:hover {
+  background-color: #c0392b;
+}
+
+.dashboard-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  color: #2c3e50; 
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 25px;
+  border-left: 5px solid #c0392b;
+}
+
+.sessions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 50px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card h4 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 1.3rem;
+  font-family: var(--font-heading);
+}
+
+.card-desc {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background-color: #3498db;
+}
+
+.btn-disabled {
+  background-color: #bdc3c7;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+  cursor: not-allowed;
+}
+
+.applications-list {
+  list-style: none;
+  padding: 0;
+}
+
+.app-item {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  border-left: 5px solid #2980b9;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-pending { background: #ffeaa7; color: #d35400; }
+.status-approved { background: #55efc4; color: #00b894; }
+.status-rejected { background: #ff7675; color: #d63031; }
+
+.upload-area {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-upload {
+  background-color: #00b894;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,184,148, 0.3);
+  transition: transform 0.2s;
+}
+
+.btn-upload:hover {
+  background-color: #00a383;
+  transform: translateY(-2px);
+}
+
+@media (min-width: 768px) {
+  .app-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.app-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.3rem;
+  color: #2c3e50;
+  font-family: var(--font-heading);
+}
+
+.app-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.app-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.upload-wrapper {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px dashed #cbd5e0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-label {
+  background-color: #e2e8f0;
+  color: #4a5568;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid #cbd5e0;
+  transition: all 0.2s;
+}
+
+.custom-file-label:hover {
+  background-color: #cbd5e0;
+}
+
+.file-name-display {
+  font-size: 0.85rem;
+  color: #2d3436;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

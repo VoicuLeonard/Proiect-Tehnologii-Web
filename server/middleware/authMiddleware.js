@@ -13,7 +13,7 @@ const verifyToken = (req, res, next) => {
         return res.status(403).json({ message: 'Format token incorect!' });
     }
 
-    const JWT_SECRET = 'secretul_meu_super_secret_pentru_licenta';
+    const JWT_SECRET = 'secretul_meu_super_secret_pentru_proiect';
 
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
         if (err) {

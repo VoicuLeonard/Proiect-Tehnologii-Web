@@ -1,13 +1,14 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import './Register.css'; 
 
 export default function Register() {
     const [formData, setFormData] = useState({
         nume: '',
         email: '',
         parola: '',
-        rol: 'STUDENT' 
+        rol: 'STUDENT'
     });
     const [message, setMessage] = useState('');
     
@@ -31,30 +32,67 @@ export default function Register() {
     };
 
     return (
-        <div style={styles.container}>
-            <h2>Înregistrare</h2>
-            {message && <p style={{ color: message.includes('succes') ? 'green' : 'red' }}>{message}</p>}
-            
-            <form onSubmit={handleSubmit} style={styles.form}>
-                <input name="nume" placeholder="Nume complet" onChange={handleChange} required style={styles.input} />
-                <input name="email" type="email" placeholder="Email" onChange={handleChange} required style={styles.input} />
-                <input name="parola" type="password" placeholder="Parola" onChange={handleChange} required style={styles.input} />
+        <div className="register-wrapper">
+            <div className="register-card">
+                <h2 className="register-title">Inregistrare Cont</h2>
                 
-                <select name="rol" onChange={handleChange} style={styles.input}>
-                    <option value="STUDENT">Student</option>
-                    <option value="PROFESOR">Profesor</option>
-                </select>
+                {message && (
+                    <div className={`message ${message.includes('succes') ? 'success' : 'error'}`}>
+                        {message}
+                    </div>
+                )}
+                
+                <form onSubmit={handleSubmit} className="register-form">
+                    <div className="form-group">
+                        <label>Nume Complet:</label>
+                        <input 
+                            name="nume" 
+                            placeholder="Ex: Popescu Ion" 
+                            onChange={handleChange} 
+                            required 
+                            className="register-input"
+                        />
+                    </div>
 
-                <button type="submit" style={styles.button}>Creează cont</button>
-            </form>
-            <p>Ai deja cont? <Link to="/login">Loghează-te</Link></p>
+                    <div className="form-group">
+                        <label>Adresa de Email:</label>
+                        <input 
+                            name="email" 
+                            type="email" 
+                            placeholder="email@exemplu.com" 
+                            onChange={handleChange} 
+                            required 
+                            className="register-input"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Parola:</label>
+                        <input 
+                            name="parola" 
+                            type="password" 
+                            placeholder="Alege o parola sigura" 
+                            onChange={handleChange} 
+                            required 
+                            className="register-input"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Rolul Tau:</label>
+                        <select name="rol" onChange={handleChange} className="register-input register-select">
+                            <option value="STUDENT">Student</option>
+                            <option value="PROFESOR">Profesor</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" className="register-button">Creeaza cont</button>
+                </form>
+
+                <p className="login-link">
+                    Ai deja cont? <Link to="/login">Autentifica-te aici</Link>
+                </p>
+            </div>
         </div>
     );
 }
-
-const styles = {
-    container: { maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' },
-    form: { display: 'flex', flexDirection: 'column', gap: '15px' },
-    input: { padding: '8px', fontSize: '16px' },
-    button: { padding: '10px', backgroundColor: '#28a745', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '16px' }
-};

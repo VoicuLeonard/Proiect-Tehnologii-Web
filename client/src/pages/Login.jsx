@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import './Login.css';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -23,48 +24,49 @@ export default function Login() {
                 navigate('/student');
             }
         } catch (err) {
-
             setError(err.response?.data?.message || 'A aparut o eroare');
         }
     };
 
     return (
-        <div style={styles.container}>
-            <h2>Autentificare</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            
-            <form onSubmit={handleSubmit} style={styles.form}>
-                <div style={styles.inputGroup}>
-                    <label>Email:</label>
-                    <input 
-                        type="email" 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        required 
-                        style={styles.input}
-                    />
-                </div>
-                <div style={styles.inputGroup}>
-                    <label>Parola:</label>
-                    <input 
-                        type="password" 
-                        value={parola} 
-                        onChange={(e) => setParola(e.target.value)} 
-                        required 
-                        style={styles.input}
-                    />
-                </div>
-                <button type="submit" style={styles.button}>Intră în cont</button>
-            </form>
-            <p>Nu ai cont? <Link to="/register">Înregistrează-te aici</Link></p>
+        <div className="login-wrapper">
+            <div className="login-card">
+                <h2 className="login-title">Autentificare</h2>
+                
+                {error && <div className="error-message">{error}</div>}
+                
+                <form onSubmit={handleSubmit} className="login-form">
+                    <div className="form-group">
+                        <label>Email:</label>
+                        <input 
+                            type="email" 
+                            placeholder="Introdu adresa de email"
+                            value={email} 
+                            onChange={(e) => setEmail(e.target.value)} 
+                            required 
+                            className="login-input"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Parola:</label>
+                        <input 
+                            type="password" 
+                            placeholder="Introdu parola"
+                            value={parola} 
+                            onChange={(e) => setParola(e.target.value)} 
+                            required 
+                            className="login-input"
+                        />
+                    </div>
+
+                    <button type="submit" className="login-button">Intra in cont</button>
+                </form>
+
+                <p className="register-link">
+                    Nu ai cont? <Link to="/register">Inregistreaza-te aici</Link>
+                </p>
+            </div>
         </div>
     );
 }
-
-const styles = {
-    container: { maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' },
-    form: { display: 'flex', flexDirection: 'column', gap: '15px' },
-    inputGroup: { display: 'flex', flexDirection: 'column' },
-    input: { padding: '8px', fontSize: '16px' },
-    button: { padding: '10px', backgroundColor: '#007BFF', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '16px' }
-};

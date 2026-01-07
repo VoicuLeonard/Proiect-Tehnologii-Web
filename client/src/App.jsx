@@ -30,7 +30,6 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         
-                        {}
                         <Route 
                             path="/student" 
                             element={
@@ -49,7 +48,6 @@ function App() {
                             } 
                         />
 
-                        {}
                         <Route path="*" element={<Navigate to="/login" />} />
                     </Routes>
                 </div>

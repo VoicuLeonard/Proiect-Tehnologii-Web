@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import './ProfDashboard.css';
 
 export default function ProfDashboard() {
     const { user, api, logout } = useContext(AuthContext);
@@ -7,7 +8,15 @@ export default function ProfDashboard() {
     const [applications, setApplications] = useState([]);
     const [message, setMessage] = useState('');
 
-    useEffect(() => { fetchApplications(); }, []);
+    useEffect(() => {
+        fetchApplications();
+
+        const interval = setInterval(() => {
+            fetchApplications();
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const fetchApplications = async () => {
         try { const res = await api.get('/applications'); setApplications(res.data); } catch (err) {}
@@ -17,8 +26,9 @@ export default function ProfDashboard() {
         e.preventDefault();
         try {
             await api.post('/sessions', newSession);
-            setMessage('Sesiune creată cu succes!');
+            setMessage('Sesiune creata cu succes!');
             setNewSession({ titlu: '', descriere: '', dataStart: '', dataEnd: '', locuriMaxime: 5 });
+            setTimeout(() => setMessage(''), 3000);
         } catch (err) { alert('Eroare la creare sesiune'); }
     };
 
@@ -31,70 +41,106 @@ export default function ProfDashboard() {
 
     const getFileUrl = (path) => {
         if (!path) return '#';
-
         const cleanPath = path.replace(/\\/g, '/'); 
         return `http://localhost:8080/${cleanPath}`;
     };
 
+    const getStatusColor = (status) => {
+        if (status.includes('ACCEPTAT') || status.includes('APROBAT')) return { background: '#d4edda', color: '#155724' };
+        if (status.includes('RESPINS')) return { background: '#f8d7da', color: '#721c24' }; 
+        return { background: '#fff3cd', color: '#856404' }; 
+    };
+
     return (
-        <div style={styles.container}>
-            <header style={styles.header}>
-                <h1>Panou Profesor: {user?.nume}</h1>
-                <button onClick={logout} style={styles.logoutBtn}>Deconectare</button>
-            </header>
+        <div className="prof-page-wrapper">
+            <nav className="prof-navbar">
+                <div className="prof-brand">
+                    <h1>🎓 Panou Profesor</h1>
+                </div>
+                <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
+                    <span>Prof. <strong>{user?.nume}</strong></span>
+                    <button onClick={logout} className="btn-logout">Deconectare</button>
+                </div>
+            </nav>
 
-            {message && <div style={styles.success}>{message}</div>}
+            <div className="prof-container">
+                {message && <div style={{gridColumn: '1 / -1', padding: '15px', background: '#d4edda', color: 'green', borderRadius: '5px'}}>{message}</div>}
 
-            <div style={styles.mainGrid}>
-                {}
-                <div style={styles.section}>
-                    <h3>Creează o Sesiune Nouă</h3>
-                    <form onSubmit={handleCreateSession} style={styles.form}>
-                        <input placeholder="Titlu" required style={styles.input} value={newSession.titlu} onChange={e => setNewSession({...newSession, titlu: e.target.value})} />
-                        <textarea placeholder="Descriere" style={styles.input} value={newSession.descriere} onChange={e => setNewSession({...newSession, descriere: e.target.value})} />
-                        <label>Data Start:</label>
-                        <input type="date" required style={styles.input} value={newSession.dataStart} onChange={e => setNewSession({...newSession, dataStart: e.target.value})} />
-                        <label>Data Final:</label>
-                        <input type="date" required style={styles.input} value={newSession.dataEnd} onChange={e => setNewSession({...newSession, dataEnd: e.target.value})} />
-                        <label>Locuri:</label>
-                        <input type="number" min="1" required style={styles.input} value={newSession.locuriMaxime} onChange={e => setNewSession({...newSession, locuriMaxime: e.target.value})} />
-                        <button type="submit" style={styles.createBtn}>Publică Sesiunea</button>
+                <div className="prof-card">
+                    <h3>Creeaza o Sesiune Noua</h3>
+                    <form onSubmit={handleCreateSession}>
+                        <div className="form-group">
+                            <input placeholder="Titlu Sesiune" required className="prof-input" 
+                                value={newSession.titlu} onChange={e => setNewSession({...newSession, titlu: e.target.value})} />
+                        </div>
+                        <div className="form-group">
+                            <textarea placeholder="Descriere tema/proiect..." rows="4" className="prof-input" 
+                                value={newSession.descriere} onChange={e => setNewSession({...newSession, descriere: e.target.value})} />
+                        </div>
+                        
+                        <div style={{display: 'flex', gap: '10px'}}>
+                            <div className="form-group" style={{flex: 1}}>
+                                <label>Data Start:</label>
+                                <input type="date" required className="prof-input" 
+                                    value={newSession.dataStart} onChange={e => setNewSession({...newSession, dataStart: e.target.value})} />
+                            </div>
+                            <div className="form-group" style={{flex: 1}}>
+                                <label>Data Final:</label>
+                                <input type="date" required className="prof-input" 
+                                    value={newSession.dataEnd} onChange={e => setNewSession({...newSession, dataEnd: e.target.value})} />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Numar Locuri:</label>
+                            <input type="number" min="1" required className="prof-input" 
+                                value={newSession.locuriMaxime} onChange={e => setNewSession({...newSession, locuriMaxime: e.target.value})} />
+                        </div>
+
+                        <button type="submit" className="btn-publish">Publica Sesiunea</button>
                     </form>
                 </div>
 
-                {}
-                <div style={styles.section}>
-                    <h3>Cereri de la Studenți</h3>
-                    {applications.length === 0 ? <p>Nicio cerere.</p> : (
-                        <ul style={styles.list}>
+                <div className="prof-card">
+                    <h3>Cereri de la Studenti</h3>
+                    {applications.length === 0 ? <p>Nu exista cereri in asteptare.</p> : (
+                        <ul className="requests-list">
                             {applications.map(app => (
-                                <li key={app.id} style={styles.card}>
-                                    <p><strong>{app.student?.nume}</strong> - {app.sesiune?.titlu}</p>
-                                    <p>Status: <span style={getStatusStyle(app.status)}>{app.status}</span></p>
-                                    
-                                    {}
-                                    {app.status === 'PENDING' && (
-                                        <div style={{marginTop: '10px'}}>
-                                            <button onClick={() => handleVerdict(app.id, 'APPROVED_PRELIM')} style={{...styles.btn, background: 'green'}}>Acceptă Preliminar</button>
-                                            <button onClick={() => handleVerdict(app.id, 'REJECTED_PRELIM', 'Nu indeplinesti conditiile')} style={{...styles.btn, background: 'red', marginLeft: '5px'}}>Respinge</button>
+                                <li key={app.id} className="request-item">
+                                    <div className="req-header">
+                                        <div>
+                                            <span className="student-name">{app.student?.nume}</span>
+                                            <br/>
+                                            <small style={{color: '#666'}}>Pt: {app.sesiune?.titlu}</small>
+                                        </div>
+                                        <span className="status-pill" style={getStatusColor(app.status)}>
+                                            {app.status}
+                                        </span>
+                                    </div>
+
+                                    {app.status === 'IN_ASTEPTARE' && (
+                                        <div className="actions-row">
+                                            <button onClick={() => handleVerdict(app.id, 'ACCEPTAT_PRELIMINAR')} className="btn-action btn-accept">Accepta Preliminar</button>
+                                            <button onClick={() => handleVerdict(app.id, 'RESPINS_PRELIMINAR', 'Nu indeplinesti conditiile')} className="btn-action btn-reject">Respinge</button>
                                         </div>
                                     )}
 
-                                    {}
-                                    {app.status === 'FILE_UPLOADED' && (
-                                        <div style={{marginTop: '10px', padding: '10px', background: '#e9ecef', borderRadius: '5px'}}>
-                                            <p style={{marginBottom: '5px'}}>📄 Studentul a încărcat cererea.</p>
-                                            <a href={getFileUrl(app.caleFisier)} target="_blank" rel="noopener noreferrer" style={styles.downloadLink}>
-                                                Descarcă Documentul
-                                            </a>
-                                            <div style={{marginTop: '10px'}}>
-                                                <button onClick={() => handleVerdict(app.id, 'APPROVED_FINAL')} style={{...styles.btn, background: '#28a745'}}>✅ Aprobă Final</button>
-                                                <button onClick={() => handleVerdict(app.id, 'REJECTED_FINAL', 'Semnatura lipsa sau gresita')} style={{...styles.btn, background: '#dc3545', marginLeft: '5px'}}>❌ Respinge (Cere reîncărcare)</button>
+                                    {app.status === 'FISIER_INCARCAT' && (
+                                        <div style={{background: '#e3f2fd', padding: '10px', borderRadius: '5px'}}>
+                                            <p style={{margin: '0 0 10px 0'}}>📄 Cerere semnata incarcata.</p>
+                                            <div className="actions-row">
+                                                <a href={getFileUrl(app.caleFisier)} target="_blank" rel="noopener noreferrer" className="btn-action btn-file">
+                                                    Descarca Document
+                                                </a>
+                                            </div>
+                                            <div className="actions-row" style={{marginTop: '10px', borderTop: '1px solid #ccc', paddingTop: '10px'}}>
+                                                <button onClick={() => handleVerdict(app.id, 'APROBAT_FINAL')} className="btn-action btn-accept">✅ Aproba Final</button>
+                                                <button onClick={() => handleVerdict(app.id, 'RESPINS_FINAL', 'Semnatura invalida')} className="btn-action btn-reject">❌ Respinge</button>
                                             </div>
                                         </div>
                                     )}
 
-                                    {app.status === 'APPROVED_FINAL' && <p style={{color: 'green', fontWeight: 'bold'}}>Dosar Complet!</p>}
+                                    {app.status === 'APROBAT_FINAL' && <p style={{color: 'green', fontWeight: 'bold', margin: 0}}>Dosar Complet!</p>}
                                 </li>
                             ))}
                         </ul>
@@ -104,24 +150,3 @@ export default function ProfDashboard() {
         </div>
     );
 }
-
-const getStatusStyle = (status) => ({
-    fontWeight: 'bold',
-    color: status.includes('APPROVED') ? 'green' : status.includes('REJECTED') ? 'red' : 'orange'
-});
-
-const styles = {
-    container: { maxWidth: '1000px', margin: '0 auto', padding: '20px' },
-    header: { display: 'flex', justifyContent: 'space-between', marginBottom: '30px' },
-    logoutBtn: { background: '#dc3545', color: '#fff', border: 'none', padding: '8px 15px', cursor: 'pointer' },
-    success: { padding: '10px', background: '#d4edda', color: '#155724', marginBottom: '15px' },
-    mainGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' },
-    section: { background: '#f9f9f9', padding: '20px', borderRadius: '8px' },
-    form: { display: 'flex', flexDirection: 'column', gap: '10px' },
-    input: { padding: '8px', border: '1px solid #ccc', borderRadius: '4px' },
-    createBtn: { padding: '10px', background: '#007bff', color: '#fff', border: 'none', cursor: 'pointer', marginTop: '10px' },
-    list: { listStyle: 'none', padding: 0 },
-    card: { background: '#fff', padding: '10px', marginBottom: '10px', border: '1px solid #ddd', borderRadius: '4px' },
-    btn: { padding: '5px 10px', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '3px', fontSize: '14px' },
-    downloadLink: { color: '#0056b3', textDecoration: 'underline', fontWeight: 'bold', display: 'block', marginBottom: '10px' }
-};

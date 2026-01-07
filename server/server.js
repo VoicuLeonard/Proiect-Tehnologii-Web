@@ -4,15 +4,21 @@ const { sequelize } = require('./models');
 const sessionRoutes = require('./routes/sessionRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const path = require('path');
+const fs = require('fs');
 
 const authRoutes = require('./routes/authRoutes'); 
+
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)){
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('Directorul uploads a fost creat automat.');
+}
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(cors());
 app.use(express.json());
-
 
 app.use('/api/auth', authRoutes); 
 app.use('/api/sessions', sessionRoutes);

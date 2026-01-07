@@ -9,14 +9,14 @@ const Application = sequelize.define('Application', {
     },
     status: {
         type: DataTypes.ENUM(
-            'PENDING',           
-            'APPROVED_PRELIM',   
-            'REJECTED_PRELIM',   
-            'FILE_UPLOADED',     
-            'APPROVED_FINAL',    
-            'REJECTED_FINAL'     
+            'IN_ASTEPTARE',
+            'ACCEPTAT_PRELIMINAR',
+            'RESPINS_PRELIMINAR',
+            'FISIER_INCARCAT',
+            'APROBAT_FINAL',
+            'RESPINS_FINAL'     
         ),
-        defaultValue: 'PENDING'
+        defaultValue: 'IN_ASTEPTARE'
     },
     justificare: {
         type: DataTypes.TEXT, 
