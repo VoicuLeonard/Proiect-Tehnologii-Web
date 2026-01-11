@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     // Configuram o instanta Axios globala cu URL-ul serverului
     // CORECT
     const api = axios.create({
-        baseURL: 'https://proiect-tehnologii-web-1.onrender.com/api', // <--- Am adaugat /api
+        baseURL: 'https://proiect-tehnologii-web-grbi.onrender.com/api', 
     });
 
     // Daca exista un token, il atasam automat la fiecare cerere HTTP (header Authorization)
