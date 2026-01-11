@@ -79,6 +79,7 @@ Accesati aplicatia in browser la adresa afisata.
 ## Aplicatia respecta un flux logic de business strict. Iata pasii recomandati pentru testarea completa:
 
    ### Pasul 1: Profesorul
+   
    * Se autentifica in aplicatie.
 
    * Vizualizeaza "Citatul Zilei" (preluat din serviciu extern).
