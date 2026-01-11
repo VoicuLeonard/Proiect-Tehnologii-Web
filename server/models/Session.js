@@ -1,6 +1,10 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
+/**
+ * MODEL: Session
+ * Defineste structura tabelului pentru sesiunile de disertatie create de profesori.
+ */
 const Session = sequelize.define('Session', {
     id: {
         type: DataTypes.INTEGER,

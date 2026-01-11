@@ -1,6 +1,11 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db'); 
 
+/**
+ * MODEL: User
+ * Defineste structura tabelului de utilizatori.
+ * Contine informatii despre nume, email, parola si rol.
+ */
 const User = sequelize.define('User', {
     id: {
         type: DataTypes.INTEGER,

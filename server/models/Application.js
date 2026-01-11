@@ -1,6 +1,11 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
+/**
+ * MODEL: Application
+ * Defineste structura tabelului pentru cererile studentilor.
+ * Gestioneaza statusul cererii si fisierele asociate.
+ */
 const Application = sequelize.define('Application', {
     id: {
         type: DataTypes.INTEGER,
@@ -23,7 +28,11 @@ const Application = sequelize.define('Application', {
         allowNull: true
     },
     caleFisier: {
-        type: DataTypes.STRING, 
+        type: DataTypes.STRING, // Calea catre fisierul incarcat de student
+        allowNull: true
+    },
+    caleFisierSemnat: {
+        type: DataTypes.STRING, // Calea catre fisierul semnat de profesor
         allowNull: true
     }
 });

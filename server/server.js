@@ -8,6 +8,7 @@ const fs = require('fs');
 
 const authRoutes = require('./routes/authRoutes'); 
 
+// Asigurare existenta folder uploads
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)){
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -20,6 +21,7 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
+// Rutele principale
 app.use('/api/auth', authRoutes); 
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/applications', applicationRoutes);
@@ -29,6 +31,7 @@ app.get('/api', (req, res) => {
     res.json({ message: 'Serverul functioneaza!' });
 });
 
+// Sincronizare baza de date si pornire server
 sequelize.sync({ alter: true }).then(() => {
     console.log('Baza de date sincronizata.');
     app.listen(PORT, () => {
