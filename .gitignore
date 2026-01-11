@@ -1,7 +1,9 @@
 node_modules/
 /server/node_modules
 /client/node_modules
-.env
-*.log
-/client/dist
 /server/database.sqlite
+/server/uploads/*
+!/server/uploads/.gitkeep
+.env
+dist/
+.DS_Store
