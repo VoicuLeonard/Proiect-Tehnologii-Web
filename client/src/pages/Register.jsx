@@ -3,28 +3,45 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import './Register.css'; 
 
+/**
+ * PAGINA: Register
+ * DESCRIERE: Formularul de inregistrare pentru noi utilizatori.
+ * Permite selectarea rolului (Student sau Profesor).
+ */
 export default function Register() {
+    // State pentru toate campurile formularului, initializat cu valori goale
     const [formData, setFormData] = useState({
         nume: '',
         email: '',
         parola: '',
-        rol: 'STUDENT'
+        rol: 'STUDENT' // Rolul implicit
     });
+    
+    // State pentru mesaje de succes sau eroare
     const [message, setMessage] = useState('');
     
     const { api } = useContext(AuthContext);
     const navigate = useNavigate();
 
+    /**
+     * HANDLER: handleChange
+     * Actualizeaza dinamic state-ul formData cand utilizatorul scrie in input-uri.
+     */
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    /**
+     * HANDLER: handleSubmit
+     * Trimite datele de inregistrare catre server.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             await api.post('/auth/register', formData);
             setMessage('Cont creat cu succes! Te redirectionam...');
             
+            // Dupa 2 secunde, redirectionam utilizatorul catre Login
             setTimeout(() => navigate('/login'), 2000);
         } catch (err) {
             setMessage(err.response?.data?.message || 'Eroare la inregistrare');
@@ -36,6 +53,7 @@ export default function Register() {
             <div className="register-card">
                 <h2 className="register-title">Inregistrare Cont</h2>
                 
+                {/* Afisare conditionata a mesajului de eroare/succes */}
                 {message && (
                     <div className={`message ${message.includes('succes') ? 'success' : 'error'}`}>
                         {message}
