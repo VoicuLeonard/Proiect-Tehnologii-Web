@@ -1,5 +1,10 @@
 const { sequelize, User, Session } = require('./models');
 
+/**
+ * SCRIPT: seedDatabase
+ * Populeaza baza de date cu date initiale de test (utilizatori, o sesiune).
+ * ATENTIE: Sterge toate datele existente (force: true).
+ */
 const seedDatabase = async () => {
     try {
         await sequelize.sync({ force: true }); 

@@ -5,6 +5,7 @@ const { verifyToken, isProfessor } = require('../middleware/authMiddleware');
 const multer = require('multer');
 const path = require('path');
 
+// Configurare stocare fisiere
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
@@ -16,6 +17,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+/**
+ * RUTA: POST /
+ * DESCRIERE: Studentul trimite o cerere de aplicare la o sesiune.
+ */
 router.post('/', verifyToken, async (req, res) => {
     try {
         const { sessionId } = req.body;
@@ -43,6 +48,10 @@ router.post('/', verifyToken, async (req, res) => {
     }
 });
 
+/**
+ * RUTA: GET /
+ * DESCRIERE: Returneaza lista de aplicatii in functie de rolul utilizatorului (Student/Profesor).
+ */
 router.get('/', verifyToken, async (req, res) => {
     try {
         if (req.userRol === 'STUDENT') {
@@ -75,6 +84,10 @@ router.get('/', verifyToken, async (req, res) => {
     }
 });
 
+/**
+ * RUTA: PUT /:id/status
+ * DESCRIERE: Profesorul schimba statusul unei cereri (Accepta/Respinge).
+ */
 router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
     try {
         const { id } = req.params; 
@@ -84,7 +97,7 @@ router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
         if (!application) return res.status(404).json({ message: 'Cererea nu exista' });
 
         if (status === 'ACCEPTAT_PRELIMINAR') {
-
+            // Verificare: Studentul are deja o alta cerere aprobata?
             const alreadyApproved = await Application.findOne({
                 where: { 
                     studentId: application.studentId,
@@ -96,6 +109,7 @@ router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
                 return res.status(400).json({ message: 'Studentul este deja aprobat la o alta sesiune!' });
             }
 
+            // Verificare: Mai sunt locuri disponibile?
             const session = await Session.findByPk(application.sessionId);
             const approvedCount = await Application.count({
                 where: { sessionId: application.sessionId, status: 'ACCEPTAT_PRELIMINAR' }
@@ -118,6 +132,10 @@ router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
     }
 });
 
+/**
+ * RUTA: POST /:id/upload
+ * DESCRIERE: Studentul incarca fisierul cu cererea.
+ */
 router.post('/:id/upload', [verifyToken, upload.single('fisier')], async (req, res) => {
     try {
         const { id } = req.params;
@@ -138,6 +156,29 @@ router.post('/:id/upload', [verifyToken, upload.single('fisier')], async (req, r
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Eroare la upload' });
+    }
+});
+
+/**
+ * RUTA: POST /:id/upload-signed
+ * DESCRIERE: Profesorul incarca fisierul semnat si finalizeaza aprobarea.
+ */
+router.post('/:id/upload-signed', [verifyToken, isProfessor, upload.single('fisier')], async (req, res) => {
+    try {
+        const { id } = req.params;
+        const application = await Application.findByPk(id);
+
+        if (!application) return res.status(404).json({ message: 'Cererea nu exista' });
+
+        application.caleFisierSemnat = req.file.path; 
+        application.status = 'APROBAT_FINAL';   
+        await application.save();
+
+        res.json({ message: 'Fisier semnat incarcat si cerere aprobata!', caleFisierSemnat: application.caleFisierSemnat });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Eroare la upload profesor' });
     }
 });
 

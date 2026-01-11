@@ -1,14 +1,36 @@
 const express = require('express');
-const router = express.Router(); 
+const router = express.Router();
 const { Session, Application } = require('../models');
 const { verifyToken, isProfessor } = require('../middleware/authMiddleware');
+const { Op } = require('sequelize'); 
 
+/**
+ * RUTA: POST /
+ * DESCRIERE: Permite unui profesor sa creeze o sesiune noua.
+ * Verifica daca sesiunea se suprapune cu alta existenta a aceluiasi profesor.
+ */
 router.post('/', [verifyToken, isProfessor], async (req, res) => {
     try {
         const { titlu, descriere, dataStart, dataEnd, locuriMaxime } = req.body;
 
+        // Validare date
         if (new Date(dataStart) >= new Date(dataEnd)) {
             return res.status(400).json({ message: 'Data de final trebuie sa fie dupa data de start!' });
+        }
+
+        // Verificare suprapunere sesiuni
+        const overlappingSession = await Session.findOne({
+            where: {
+                profesorId: req.userId,
+                [Op.and]: [
+                    { dataStart: { [Op.lt]: new Date(dataEnd) } },
+                    { dataEnd: { [Op.gt]: new Date(dataStart) } }
+                ]
+            }
+        });
+
+        if (overlappingSession) {
+            return res.status(400).json({ message: 'Exista deja o sesiune care se suprapune cu aceasta perioada!' });
         }
 
         const session = await Session.create({
@@ -28,6 +50,10 @@ router.post('/', [verifyToken, isProfessor], async (req, res) => {
     }
 });
 
+/**
+ * RUTA: GET /
+ * DESCRIERE: Returneaza toate sesiunile, inclusiv numarul de locuri ocupate.
+ */
 router.get('/', verifyToken, async (req, res) => {
     try {
         const sessions = await Session.findAll({
@@ -40,6 +66,7 @@ router.get('/', verifyToken, async (req, res) => {
         const sessionsWithCounts = sessions.map(session => {
             const sessionJson = session.toJSON();
             
+            // Calculeaza locurile ocupate (doar statusuri valide)
             const locuriOcupate = session.aplicatiiSesiune ? session.aplicatiiSesiune.filter(app => 
                 ['ACCEPTAT_PRELIMINAR', 'FISIER_INCARCAT', 'APROBAT_FINAL'].includes(app.status)
             ).length : 0;
