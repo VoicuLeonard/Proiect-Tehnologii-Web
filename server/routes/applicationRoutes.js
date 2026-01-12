@@ -4,6 +4,7 @@ const { Application, Session, User } = require('../models');
 const { verifyToken, isProfessor } = require('../middleware/authMiddleware');
 const multer = require('multer');
 const path = require('path');
+const { Op } = require('sequelize'); 
 
 // Configurare stocare fisiere
 const storage = multer.diskStorage({
@@ -25,6 +26,15 @@ router.post('/', verifyToken, async (req, res) => {
     try {
         const { sessionId } = req.body;
         const studentId = req.userId; 
+
+        // Verificam daca studentul are deja o lucrare aprobata final oriunde
+        const alreadyFinal = await Application.findOne({
+            where: { studentId, status: 'APROBAT_FINAL' }
+        });
+
+        if (alreadyFinal) {
+            return res.status(400).json({ message: 'Ai deja o lucrare de licenta aprobata final! Nu mai poti aplica.' });
+        }
 
         const existingApp = await Application.findOne({
             where: { studentId, sessionId }
@@ -96,17 +106,35 @@ router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
         const application = await Application.findByPk(id);
         if (!application) return res.status(404).json({ message: 'Cererea nu exista' });
 
+        // VERIFICARE GLOBALA APROBARE FINALA ---
         if (status === 'ACCEPTAT_PRELIMINAR') {
-            // Verificare: Studentul are deja o alta cerere aprobata?
-            const alreadyApproved = await Application.findOne({
-                where: { 
+            const isTaken = await Application.findOne({
+                where: {
                     studentId: application.studentId,
-                    status: 'ACCEPTAT_PRELIMINAR',
+                    status: 'APROBAT_FINAL'
                 }
             });
 
-            if (alreadyApproved) {
-                return res.status(400).json({ message: 'Studentul este deja aprobat la o alta sesiune!' });
+            if (isTaken) {
+                return res.status(400).json({ 
+                    message: 'Acest student are deja o lucrare aprobata final la un alt profesor! Nu il poti accepta.' 
+                });
+            }
+        }
+
+
+        if (status === 'ACCEPTAT_PRELIMINAR') {
+            // Verificare: Studentul are deja o alta cerere acceptata preliminar (la acelasi prof sau altul)?
+            const alreadyPreApproved = await Application.findOne({
+                where: { 
+                    studentId: application.studentId,
+                    status: 'ACCEPTAT_PRELIMINAR',
+                    id: { [Op.ne]: id } // Excludem cererea curenta
+                }
+            });
+
+            if (alreadyPreApproved) {
+                return res.status(400).json({ message: 'Studentul este deja acceptat preliminar la o alta sesiune!' });
             }
 
             // Verificare: Mai sunt locuri disponibile?
@@ -122,14 +150,12 @@ router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
 
         application.status = status;
         
-        // Daca exista o justificare noua (ex: la respingere), o salvam.
-        // Daca nu (ex: la acceptare), setam campul pe NULL pentru a sterge mesajele vechi.
+        // Stergem motivul respingerii daca acum e acceptat
         if (justificare) {
             application.justificare = justificare;
         } else {
             application.justificare = null;
         }
-
 
         await application.save();
 
@@ -151,6 +177,14 @@ router.post('/:id/upload', [verifyToken, upload.single('fisier')], async (req, r
         const application = await Application.findByPk(id);
 
         if (!application) return res.status(404).json({ message: 'Cererea nu exista' });
+
+        // Verificam si aici daca intre timp a fost aprobat final in alta parte
+        const isTaken = await Application.findOne({
+            where: { studentId: application.studentId, status: 'APROBAT_FINAL' }
+        });
+        if (isTaken) {
+            return res.status(400).json({ message: 'Ai deja o lucrare aprobata final in alta parte.' });
+        }
 
         if (application.status !== 'ACCEPTAT_PRELIMINAR' && application.status !== 'RESPINS_FINAL') {
             return res.status(400).json({ message: 'Nu poti incarca fisier in acest stadiu!' });
@@ -179,11 +213,26 @@ router.post('/:id/upload-signed', [verifyToken, isProfessor, upload.single('fisi
 
         if (!application) return res.status(404).json({ message: 'Cererea nu exista' });
 
+        const isTaken = await Application.findOne({
+            where: {
+                studentId: application.studentId,
+                status: 'APROBAT_FINAL',
+                id: { [Op.ne]: id } 
+            }
+        });
+
+        if (isTaken) {
+            return res.status(400).json({ 
+                message: 'Eroare! Acest student a fost deja aprobat final de un alt profesor.' 
+            });
+        }
+
+
         application.caleFisierSemnat = req.file.path; 
         application.status = 'APROBAT_FINAL';
         
+        // Stergem motivul respingerii anterioare
         application.justificare = null;
-
         
         await application.save();
 
