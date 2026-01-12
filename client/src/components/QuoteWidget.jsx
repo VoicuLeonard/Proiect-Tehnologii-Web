@@ -60,7 +60,7 @@ export default function QuoteWidget() {
             gap: '5px'
         }}>
             <span style={{ fontSize: '0.8rem', color: '#95a5a6', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                💡 Citatul Zilei (Serviciu Extern)
+                💡 Citatul Zilei 
             </span>
             <p style={{ margin: 0, fontSize: '1rem', color: '#2c3e50', fontStyle: 'italic' }}>
                 "{quote.quote}"

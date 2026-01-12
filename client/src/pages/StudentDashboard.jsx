@@ -89,8 +89,16 @@ export default function StudentDashboard() {
     // Helper pentru a construi URL-ul corect catre fisiere
     const getFileUrl = (path) => {
         if (!path) return '#';
-        const cleanPath = path.replace(/\\/g, '/'); // Inlocuim backslash cu slash pentru compatibilitate
-        return `http://localhost:8080/${cleanPath}`;
+        // Inlocuim backslash cu slash
+        const cleanPath = path.replace(/\\/g, '/');
+        
+        // LOGICA NOUA:
+        // Verificam daca suntem in productie (pe Vercel) sau local
+        const baseUrl = import.meta.env.PROD 
+            ? 'https://proiect-tehnologii-web-0w6z.onrender.com' 
+            : 'http://localhost:8080'; 
+
+        return `${baseUrl}/${cleanPath}`;
     };
 
     // Helper: Verifica daca studentul a aplicat deja la sesiunea curenta

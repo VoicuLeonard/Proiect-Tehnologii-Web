@@ -98,8 +98,16 @@ export default function ProfDashboard() {
 
     const getFileUrl = (path) => {
         if (!path) return '#';
-        const cleanPath = path.replace(/\\/g, '/'); 
-        return `http://localhost:8080/${cleanPath}`;
+        // Inlocuim backslash cu slash
+        const cleanPath = path.replace(/\\/g, '/');
+        
+        // LOGICA NOUA:
+        // Verificam daca suntem in productie (pe Vercel) sau local
+        const baseUrl = import.meta.env.PROD 
+            ? 'https://proiect-tehnologii-web-0w6z.onrender.com' 
+            : 'http://localhost:8080'; 
+
+        return `${baseUrl}/${cleanPath}`;
     };
 
     const getStatusColor = (status) => {
