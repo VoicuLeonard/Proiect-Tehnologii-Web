@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     // Configuram o instanta Axios globala cu URL-ul serverului
-    // CORECT
     const api = axios.create({
         baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api', 
     });
