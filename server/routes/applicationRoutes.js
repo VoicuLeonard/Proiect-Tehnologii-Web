@@ -121,7 +121,16 @@ router.put('/:id/status', [verifyToken, isProfessor], async (req, res) => {
         }
 
         application.status = status;
-        if (justificare) application.justificare = justificare;
+        
+        // Daca exista o justificare noua (ex: la respingere), o salvam.
+        // Daca nu (ex: la acceptare), setam campul pe NULL pentru a sterge mesajele vechi.
+        if (justificare) {
+            application.justificare = justificare;
+        } else {
+            application.justificare = null;
+        }
+
+
         await application.save();
 
         res.json({ message: `Cerere actualizata: ${status}`, application });
@@ -171,7 +180,11 @@ router.post('/:id/upload-signed', [verifyToken, isProfessor, upload.single('fisi
         if (!application) return res.status(404).json({ message: 'Cererea nu exista' });
 
         application.caleFisierSemnat = req.file.path; 
-        application.status = 'APROBAT_FINAL';   
+        application.status = 'APROBAT_FINAL';
+        
+        application.justificare = null;
+
+        
         await application.save();
 
         res.json({ message: 'Fisier semnat incarcat si cerere aprobata!', caleFisierSemnat: application.caleFisierSemnat });
