@@ -101,7 +101,6 @@ export default function ProfDashboard() {
         // Inlocuim backslash cu slash
         const cleanPath = path.replace(/\\/g, '/');
         
-        // LOGICA NOUA:
         // Verificam daca suntem in productie (pe Vercel) sau local
         const baseUrl = import.meta.env.PROD 
             ? 'https://proiect-tehnologii-web-0w6z.onrender.com' 
