@@ -1,5 +1,7 @@
 # Proiect-Tehnologii-Web
 
+Link aplicatie: proiect-tehnologii-web-lyart.vercel.app
+
 1. Specificatii Detaliate
 
 A. Roluri Utilizatori
